@@ -8,7 +8,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 
 const Tab = createBottomTabNavigator();
 
-const MainNavigator = () => {
+const Navbar = () => {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -39,6 +39,6 @@ const MainNavigator = () => {
   );
 };
 
-export default MainNavigator;
+export default Navbar;
 
 

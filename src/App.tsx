@@ -5,7 +5,6 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import LoginPage from "./screens/LoginPage";
 
 import RegisterPage from  "./screens/RegisterPage";
-import CreateNewhabbitForm from "./components/CreateNewhabbitForm";
 import  HomePage  from "./screens/HomePage";
 
 const Stack = createNativeStackNavigator();
@@ -19,5 +18,6 @@ export default function YourComponentName() {
         <Stack.Screen name="Home" component={HomePage} />
       </Stack.Navigator>
     </NavigationContainer>
+  
   );
 }

@@ -52,7 +52,7 @@ const LoginPage = ({navigation}:any) => {
                     onChangeText={setPassword}
                     secureTextEntry={true}
                 />
-                <Button title="Login" onPress={handleLogin} />
+                <Button   title="Login" onPress={handleLogin} />
                 <Text style={styles.registerText}>Don't have an account?</Text>
                 <Button title="Register" onPress={handleRegister} />
             </View> 

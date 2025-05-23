@@ -6,7 +6,7 @@ import LoginPage from "./screens/LoginPage";
 
 import RegisterPage from  "./screens/RegisterPage";
 import  HomePage  from "./screens/HomePage";
-
+import CreateNewhabbitForm from "./components/CreateNewhabbitForm";
 const Stack = createNativeStackNavigator();
 
 export default function YourComponentName() {
@@ -16,6 +16,7 @@ export default function YourComponentName() {
         <Stack.Screen name="Login" component={LoginPage} />
         <Stack.Screen name="Register" component={RegisterPage} />
         <Stack.Screen name="Home" component={HomePage} />
+        <Stack.Screen name="CreateHabit" component={CreateNewhabbitForm} />
       </Stack.Navigator>
     </NavigationContainer>
   

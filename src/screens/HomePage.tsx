@@ -8,18 +8,18 @@ import {
   Alert,
   TouchableOpacity,
   RefreshControl,
+  Pressable,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ConfettiCannon from 'react-native-confetti-cannon';
-import { useNavigation } from '@react-navigation/native'; // ✅ Added for navigation
+import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 type Habit = {
   habitName: string;
-  frequency: string; 
+  frequency: string;
   completedDates?: string[];
 };
-
 
 type RootStackParamList = {
   HomePage: undefined;
@@ -104,29 +104,43 @@ const HomePage = () => {
 
   return (
     <View style={darkModeOn ? styles.darkContainer : styles.container}>
-      <Button title="Change Theme" onPress={changeDarkMode} />
-      <Text style={styles.title}>Your Habits</Text>
+       <View style={styles.themeToggleContainer}>
+              <Pressable onPress={changeDarkMode} style={styles.themeToggleButton}>
+                <Text style={{color: darkModeOn ? '#fff' : '#000'}}>
+                  {darkModeOn ? 'Light Mode' : 'Dark Mode'}
+                </Text>
+              </Pressable>
+            </View>
+
+      <Text style={darkModeOn ? styles.titleDark : styles.title}>Your Habits</Text>
 
       {/* Add New Habit Button */}
-      <View style={{ marginBottom: 10 }}>
-        <Button title="Add New Habit" onPress={() => navigation.navigate('CreateNewHabitForm')} />
-      </View>
+      <TouchableOpacity
+        style={styles.addHabitButton}
+        onPress={() => navigation.navigate('CreateNewHabitForm')}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.addHabitButtonText}>+ Add New Habit</Text>
+      </TouchableOpacity>
 
       {/* Filter Buttons */}
       <View style={styles.filterContainer}>
-        {['all', 'daily', 'weekly'].map((type) => (
+        {['all', 'daily', 'weekly'].map(type => (
           <TouchableOpacity
             key={type}
             style={[
               styles.filterButton,
               filter === type && styles.activeFilter,
+              darkModeOn && filter === type ? styles.activeFilterDark : null,
             ]}
             onPress={() => setFilter(type as 'all' | 'daily' | 'weekly')}
+            activeOpacity={0.7}
           >
             <Text
               style={[
                 styles.filterText,
                 filter === type && styles.activeFilterText,
+                darkModeOn && filter === type ? styles.activeFilterTextDark : null,
               ]}
             >
               {type.toUpperCase()}
@@ -144,59 +158,123 @@ const HomePage = () => {
           const isCompleted = item.completedDates?.includes(today);
 
           return (
-            <View style={styles.habitItem}>
-              <Text style={styles.habitName}>{item.habitName}</Text>
-              <Text style={styles.frequency}>{item.frequency}</Text>
-              <Button
-                title={isCompleted ? '✅ Completed' : 'Mark Complete'}
-                onPress={() => handleMarkCompleted(item)}
-                disabled={isCompleted}
-              />
-              <Button
-                title="Delete"
-                onPress={() => handleDeleteHabit(item)}
-                color={'#D20103'}
-              />
+            <View style={[styles.habitItem, darkModeOn && styles.habitItemDark]}>
+              <View style={styles.habitTextContainer}>
+                <Text style={[styles.habitName, darkModeOn && styles.habitNameDark]}>
+                  {item.habitName}
+                </Text>
+                <Text style={[styles.frequency, darkModeOn && styles.frequencyDark]}>
+                  {item.frequency}
+                </Text>
+              </View>
+
+              <View style={styles.buttonsRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.completeButton,
+                    isCompleted ? styles.completedButton : null,
+                    darkModeOn && !isCompleted ? styles.completeButtonDark : null,
+                  ]}
+                  onPress={() => handleMarkCompleted(item)}
+                  disabled={isCompleted}
+                  activeOpacity={0.8}
+                >
+                  <Text
+                    style={[
+                      styles.completeButtonText,
+                      isCompleted ? styles.completedButtonText : null,
+                    ]}
+                  >
+                    {isCompleted ? '✅ Completed' : 'Mark Complete'}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.deleteButton}
+                  onPress={() => handleDeleteHabit(item)}
+                  activeOpacity={0.8}
+                >
+                  <Text style={styles.deleteButtonText}>Delete</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           );
         }}
-        contentContainerStyle={{ marginTop: 20 }}
+        contentContainerStyle={{ paddingBottom: 30 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={fetchHabits} />
         }
+        ListEmptyComponent={
+          <Text style={[styles.emptyText, darkModeOn && styles.emptyTextDark]}>
+            No habits found. Add some!
+          </Text>
+        }
       />
 
-    
-      {showConfetti && (
-        <ConfettiCannon count={100} origin={{ x: 200, y: -10 }} fadeOut />
-      )}
+      {showConfetti && <ConfettiCannon count={100} origin={{ x: 200, y: -10 }} fadeOut />}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fff' },
-  darkContainer: { flex: 1, padding: 20, backgroundColor: '#000' },
-  habitItem: {
+  container: {
+    flex: 1,
+    backgroundColor: '#f6f8ff',
+    padding: 20,
+  },
+  darkContainer: {
+    flex: 1,
+    backgroundColor: '#121212',
+    padding: 20,
+  },
+  themeButton: {
+    alignSelf: 'center',
+    backgroundColor: '#13105F',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 25,
     marginBottom: 15,
-    padding: 10,
-    backgroundColor: '#eee',
-    borderRadius: 5,
+    elevation: 4,
+    shadowColor: '#13105F',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 5,
+  },
+  themeButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    marginVertical: 20,
     color: '#13105F',
     textAlign: 'center',
+    marginBottom: 20,
   },
-  habitName: {
-    fontSize: 18,
+  titleDark: {
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#90caf9',
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  frequency: {
+  addHabitButton: {
+    backgroundColor: '#5a72f0',
+    paddingVertical: 14,
+    borderRadius: 30,
+    marginBottom: 15,
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#5a72f0',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.7,
+    shadowRadius: 8,
+  },
+  addHabitButtonText: {
+    color: '#fff',
+    fontWeight: '700',
     fontSize: 16,
-    color: '#555',
   },
   filterContainer: {
     flexDirection: 'row',
@@ -204,22 +282,135 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   filterButton: {
-    padding: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 20,
     borderRadius: 20,
-    marginHorizontal: 5,
     backgroundColor: '#ccc',
+    marginHorizontal: 6,
+    elevation: 2,
+    shadowColor: '#ccc',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.6,
+    shadowRadius: 3,
   },
   activeFilter: {
     backgroundColor: '#13105F',
   },
+  activeFilterDark: {
+    backgroundColor: '#3949ab',
+  },
   filterText: {
-    fontSize: 14,
     color: '#000',
+    fontWeight: '600',
   },
   activeFilterText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '700',
   },
+  activeFilterTextDark: {
+    color: '#e3f2fd',
+  },
+  habitItem: {
+    backgroundColor: '#fff',
+    borderRadius: 15,
+    padding: 15,
+    marginBottom: 15,
+    elevation: 4,
+    shadowColor: '#555',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 7,
+  },
+  habitItemDark: {
+    backgroundColor: '#222',
+    shadowColor: '#000',
+  },
+  habitTextContainer: {
+    marginBottom: 12,
+  },
+  habitName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#13105F',
+  },
+  habitNameDark: {
+    color: '#90caf9',
+  },
+  frequency: {
+    fontSize: 16,
+    color: '#555',
+  },
+  frequencyDark: {
+    color: '#bbb',
+  },
+  buttonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  completeButton: {
+    backgroundColor: '#6fcf97',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    flex: 1,
+    marginRight: 10,
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#3a7d44',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+  },
+  completeButtonDark: {
+    backgroundColor: '#81c784',
+  },
+  completedButton: {
+    backgroundColor: '#a5d6a7',
+  },
+  completeButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  completedButtonText: {
+    color: '#2e7d32',
+  },
+  deleteButton: {
+    backgroundColor: '#f44336',
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 3,
+    shadowColor: '#ba000d',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.7,
+    shadowRadius: 5,
+  },
+  deleteButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+  },
+  emptyText: {
+    textAlign: 'center',
+    marginTop: 60,
+    fontSize: 18,
+    color: '#777',
+  },
+  emptyTextDark: {
+    color: '#bbb',
+  },
+    themeToggleContainer: {
+    alignItems: 'flex-end',
+    marginBottom: 20,
+  },
+   themeToggleButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: '#10B7DA',
+  }
 });
 
 export default HomePage;

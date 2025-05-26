@@ -3,12 +3,15 @@ import React from "react";
 import { View, Text, StyleSheet,Alert } from "react-native";
 
 
+import { useNavigation } from "@react-navigation/native";
+
 const LogOutButton = () => {
+    const navigation = useNavigation() as any;
 
     const handleLogout = async () => {
-        
         await AsyncStorage.removeItem('email');
         await AsyncStorage.removeItem('password');
+        navigation.navigate('Login');
         Alert.alert("Logged out successfully!");
     };
 
@@ -46,4 +49,6 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
     },}
-)
+);
+
+export default LogOutButton;

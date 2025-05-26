@@ -1,59 +1,90 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { LineChart } from "react-native-chart-kit";
+import React, {useEffect, useState} from 'react';
+import {View, Text, StyleSheet, ActivityIndicator, Button} from 'react-native';
+import {
+  calculateTodaysCompletion,
+  calculateWeeklyProgress,
+} from '../services/habitAnalysisService'; // Adjust path as needed
 
-const HabitAnalyzePage = () => {    
-    return(
-        <View style={styles.container}>
-            <Text style={styles.title}>Habit Analysis</Text>
-            <Text style={styles.description}>Analyze your habits over time.</Text>
-            <LineChart
-                data={{
-                    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-                    datasets: [
-                        {
-                            data: [20, 45, 28, 80, 99, 43],
-                        },
-                    ],
-                }}
-                width={400}
-                height={220}
-                yAxisLabel="$"
-                chartConfig={{
-                    backgroundColor: "#e26a00",
-                    backgroundGradientFrom: "#fb8c00",
-                    backgroundGradientTo: "#ffa726",
-                    decimalPlaces: 2,
-                    color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
-                    style: {
-                        borderRadius: 16,
-                    },
-                }}
-                bezier
-                style={{
-                    marginVertical: 8,
-                    borderRadius: 16,
-                }}
-            />
-        </View>
-    );}
+const HabitAnalyzePage = () => {
+  const [todayPercent, setTodayPercent] = useState<number>(0);
+  const [weekPercent, setWeekPercent] = useState<number>(0);
+  const [loading, setLoading] = useState(true);
+  const [darkModeOn, setDarkModeOn] = useState(false);
 
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#f0f0f0',
-        },
-        title: {
-            fontSize: 24,
-            fontWeight: 'bold',
-            marginBottom: 20,
-        },
-        description: {
-            fontSize: 16,
-            marginBottom: 20,
-        },
-    });
+  const changeDarkMode = () => {
+    setDarkModeOn(prev => !prev);
+  };
+
+  useEffect(() => {
+    const analyze = async () => {
+      setLoading(true);
+      const today = await calculateTodaysCompletion();
+      const week = await calculateWeeklyProgress();
+      setTodayPercent(today);
+      setWeekPercent(week);
+      setLoading(false);
+    };
+
+    analyze();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" />
+        <Text>Analyzing your habits...</Text>
+      </View>
+    );
+  }
+
+  return (<>
+    <View style={styles.Button}>
+      <Button title="Change theme" onPress={changeDarkMode} />
+    </View>
+    <View style={darkModeOn ? styles.darkContainer : styles.container}>
+    
+      <Text style={styles.title}>Habit Analysis</Text>
+      <Text style={styles.stat}>
+        ✅ % of Habits Completed Today: {todayPercent.toFixed(1)}%
+      </Text>
+      <Text style={styles.stat}>
+        📈 Weekly Progress: {weekPercent.toFixed(1)}%
+      </Text>
+    </View>
+    </>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20
+    },
+
+  stat: {
+    fontSize: 18,
+    marginVertical: 10
+    },
+
+  darkContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: '#000',
+    color: '#fff',
+  },
+  Button: {
+    paddingBottom: 10, 
+  }
+});
 
 export default HabitAnalyzePage;

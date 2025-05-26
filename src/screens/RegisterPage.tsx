@@ -5,9 +5,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const RegisterPage = ({ navigation }: any) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
+  const [name, setName] = React.useState("");
 
   const handleRegister = async () => {
-    if (email === "" || password === "") {
+    if (email === "" || password === "" || name === "") {
       Alert.alert("Please fill in all fields");
       return;
     }
@@ -17,7 +18,7 @@ const RegisterPage = ({ navigation }: any) => {
         if (existingEmail!== null) {
             Alert.alert("Email already exists");}
     
-      await AsyncStorage.setItem(email, password);
+      await AsyncStorage.setItem(email, JSON.stringify({ password, name }));
 
       Alert.alert("Registration successful");
 
@@ -33,6 +34,12 @@ const RegisterPage = ({ navigation }: any) => {
 return (
     <View style={styles.container}>
       <Text style={styles.title}>Register</Text>
+      <TextInput
+            style={styles.input}  
+            placeholder="Name"
+            value={name}
+            onChangeText={setName} />
+            
         <TextInput
             style={styles.input}
             placeholder="Email"

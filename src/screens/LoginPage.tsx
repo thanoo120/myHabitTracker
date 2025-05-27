@@ -14,13 +14,13 @@ const LoginPage = ({ navigation }: any) => {
     }
 
     try {
-      const savedUser = await AsyncStorage.getItem(email); // Fetch user by email
+      const savedUser = await AsyncStorage.getItem(email); 
       if (savedUser !== null) {
         const parsedUser = JSON.parse(savedUser);
         if (parsedUser.password === password) {
-          await AsyncStorage.setItem('currentUserEmail', email); // Store current login
+          await AsyncStorage.setItem('currentUserEmail', email);
           Alert.alert('Login successful');
-          navigation.navigate('Navbar'); // ✅ Redirect to Home/Profile page
+          navigation.navigate('Navbar'); 
         } else {
           Alert.alert('Invalid email or password');
         }

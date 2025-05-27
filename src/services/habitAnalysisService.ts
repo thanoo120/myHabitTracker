@@ -41,7 +41,7 @@ export const calculateWeeklyProgress = async (): Promise<number> => {
   const habits = await getHabits();
   const today = new Date();
   const currentWeekStart = new Date(today);
-  currentWeekStart.setDate(today.getDate() - today.getDay()); // Sunday
+  currentWeekStart.setDate(today.getDate() - today.getDay()); 
 
   const weekDates = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(currentWeekStart);
